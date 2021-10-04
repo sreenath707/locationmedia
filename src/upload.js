@@ -17,13 +17,10 @@ function Upload(props){
     const [popover,setpopover] = useState(false);
 
     const [caption,setCaption] = useState('');
+    const [isPosted,setIsPosted] = useState(false);
+
+
     function postUploadHandler(event){
-        console.log( {
-            userName : props.user.userName,
-            profilePic : props.user.profilePic,
-            caption : caption,
-            location : props.gpsCords
-        })
         axios.post('http://localhost:80/post',
          
         {
@@ -32,8 +29,10 @@ function Upload(props){
             caption : caption,
             location : props.gpsCords
         })
-        setpopover(true);
-        setAnchorEl(event.currentTarget);
+        
+        console.log("arroved");
+        setIsPosted(true);
+        setTimeout(()=>{setIsPosted(false)},5000);
 
     }
 
@@ -45,7 +44,7 @@ function Upload(props){
       })
     return (
         <div style={{padding: '10px'}}>
-            <TextField onChange={(e,v)=>{setCaption(e.target.value)}} style={{color : 'white'}} id="standard-basic" label="What's in your mind" variant="standard" focused />
+            <TextField onChange={(e)=>{setCaption(e.target.value)}} style={{color : 'white'}} id="standard-basic" label="What's in your mind" variant="standard" focused />
             <Grid container style={{borderRadius : '3%',border: "1px solid white",height : '300px',marginTop : '10px'}}>
             <MapContainer  style={{ borderRadius : '3%',zIndex : 100,width : '100%'}} center={props.gpsCords} zoom={13} scrollWheelZoom={false}>
                 <TileLayer
@@ -65,21 +64,11 @@ function Upload(props){
                  style={{marginTop : '10px',marginLeft : '80%'}} variant="contained" endIcon={<SendIcon />}>
                 Post
             </Button>
+            {
+                isPosted && <div style={{marginLeft : '40%', marginTop : '10%', fontSize : '140%'}}>Posted...</div>
+            }
 
-            <Popover
-                
-                open={popover}
-                anchorEl={anchorEl}
-                onClose={()=>{setpopover(false)}}
-                anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-                }}
-               
-            >
-                Posted
-            </Popover>
-            
+
         </div>
     )
 }
