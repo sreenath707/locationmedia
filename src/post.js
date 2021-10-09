@@ -23,7 +23,7 @@ function Post(props)
             <Grid container style={{maxHeight : '50px'}}>
                 <Grid item xs='2' style={{maxHeight : '60px'}}>
                     <img src={props.postdetails.profilePic}
-                        style={{height : '100%',borderRadius :"50%"}}
+                        style={{height : '50px',width : '50px',borderRadius :"50%"}}
                     >
 
                     </img>

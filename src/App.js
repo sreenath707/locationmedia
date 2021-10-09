@@ -32,12 +32,13 @@ function App() {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [isIncorrect,setIsInCorrect] = useState(false);
+  const [isGoing,setIsGoing] = useState(false);
 
   const [postUserName,setPostUserName] = useState('');
   const [postPassword,setPostPassword] = useState('');
   const [postEmail,setPostEmail] = useState('');
   let history = useHistory();
-  const [currentUser,setCurrentUser] = useState({});
+  const [currentUser,setCurrentUser] = useState(JSON.parse(localStorage.getItem("currUser")));
 
   function fetchPostHandler(){
     axios.get('http://localhost:80/post')
@@ -48,8 +49,8 @@ function App() {
   }
 
   useEffect(()=>{
-    setCurrentUser(JSON.parse(localStorage.getItem("currentUser")));
-    console.log(currentUser);
+    
+    console.log("entered");
     navigator.geolocation.getCurrentPosition(position=>{
       setgpsCords([position.coords.latitude,position.coords.longitude]);
     },error=>{
@@ -59,26 +60,25 @@ function App() {
     axios.get('http://localhost:80/post')
       .then(data=>{
         setPosts(data.data);
+        setCurrentUser(()=>(JSON.parse(localStorage.getItem("currUser"))));
+        console.log(JSON.parse(localStorage.getItem("currUser")));
       })
       .catch(e=>{console.log(e)})
 
-  },[])
+      setTimeout(() => {
+        if(currentUser != JSON.parse(localStorage.getItem("currUser"))){
+          setCurrentUser(JSON.parse(localStorage.getItem("currUser")));
+        }
+      }, 2000);
 
-  useEffect(()=>{
-    let filteredPosts = posts.filter((element)=>{
-      if(element.userName == currentUser.username){
-        return false;
-      }
-      return true;
-    })
-    setCurPosts(filteredPosts);
-  },[currentUser]);
+  },[isGoing])
 
   function formSubmitHandler(){
     axios.post('http://localhost:80/user',{username :userName,password})
     .then(data=>{
       if(data.data[0]){
-        localStorage.setItem("currentUser",JSON.stringify(data.data[0]) );
+        localStorage.setItem("currUser",JSON.stringify(data.data[0]) );
+        setIsGoing(prev=>(!prev));
         history.push("/home");
       }
       else{
@@ -96,6 +96,7 @@ function App() {
     .catch(e=>{console.log(e)})
   }
 
+
   return (
 
         <switch>
@@ -108,8 +109,12 @@ function App() {
                 
                 
                   <div style={{minHeight : '700px',color : 'white',background : '#141715',paddingTop : '50px',paddingBotom : '50px'}}>
-                      {value==0?curPosts.map(post=>{
-                        return(<Post postdetails = {post}></Post>)
+                      {value==0?posts.map(post=>{
+                          if(post.userName === currentUser.username){
+                            return null;
+                          }else{
+                            return(<Post postdetails = {post}></Post>)
+                          }
                       }):
                       value==1 ? 
                       <Upload  user={currentUser} gpsCords={gpsCords}></Upload> :
@@ -143,7 +148,7 @@ function App() {
             </Route>
             <Route path="/signup">
               <div>
-                  <AppBar style={{display : "flex", justifyContent : 'center' ,height : '50px', background : "#101210"}}>
+                  <AppBar  style={{display : "flex", justifyContent : 'center' ,height : '50px', background : "#101210"}}>
                     <div style={{margin : '10px',fontSize : '170%',fontWeight : 700}}>TravelGram</div>
                   </AppBar>
                   

@@ -24,7 +24,7 @@ function Upload(props){
         axios.post('http://localhost:80/post',
          
         {
-            userName : props.user.userName,
+            userName : props.user.username,
             profilePic : props.user.profilePic,
             caption : caption,
             location : props.gpsCords
